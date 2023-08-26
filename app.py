@@ -1,7 +1,7 @@
 from flask import request , jsonify,g
 import requests
 import json
-from flask import Flask, render_template
+from flask import Flask, render_template,render_template_string
 from db import init_db,get_db,close_db,find_id_user
 
 app = Flask(__name__)
@@ -21,15 +21,38 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/find_team' , methods=['GET', 'POST'])
+@app.route('/find_team' , methods=['GET'])
 def find_team():
-    if request.method=='GET':
-        return render_template('index.html')
-    else:
-        team=request.form['team_name']
-        result=find_id_user(g.db,team)
-        print(result)
-        return render_template('show_table.html',data_list=result)
+    team=request.args.get('team','')
+    result=find_id_user(g.db,team)
+    print(result)
+    template = '''
+     <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>인사정보체계</title>
+        </head>
+        <body>
+            <h1>%s에 대한 검색 결과</h1>
+            <table border="1" id="table">
+                <thead>
+                    <tr>
+                        <th width="200px">팀명</th>
+                        <th width="250px">이름</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    %s
+                </tbody>
+            </table>
+
+            <a href="/">원래페이지</a>
+        </body>
+    </html>
+    ''' % (team, ''.join('<tr><td width="200px">%s</td><td width="200px">%s</td></tr>' % (obj['team'], obj['name']) for obj in result))
+
+
+    return render_template_string(template, data_list=result)
 
 
 if __name__ =="__main__" :
