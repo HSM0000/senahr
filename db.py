@@ -42,3 +42,10 @@ def find_id_user(db, team):
         result = cursor.fetchall()
         #db에 id가 존재함
         return result     
+    
+def find_user(db):
+    with db.cursor() as cursor:
+        sql= "select * from senahr.user"
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        return result     

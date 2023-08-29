@@ -2,7 +2,7 @@ from flask import request , jsonify,g
 import requests
 import json
 from flask import Flask, render_template,render_template_string
-from db import init_db,get_db,close_db,find_id_user
+from db import init_db,get_db,close_db,find_id_user,find_user
 
 app = Flask(__name__)
 
@@ -18,7 +18,9 @@ def teardown_request(exception):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    result=find_user(g.db)
+    return render_template('index.html',data_list=result)
+
 
 
 @app.route('/find_team' , methods=['GET'])
@@ -39,6 +41,7 @@ def find_team():
                     <tr>
                         <th width="200px">팀명</th>
                         <th width="250px">이름</th>
+                        <th width="250px">phone_number</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,7 +52,7 @@ def find_team():
             <a href="/">원래페이지</a>
         </body>
     </html>
-    ''' % (team, ''.join('<tr><td width="200px">%s</td><td width="200px">%s</td></tr>' % (obj['team'], obj['name']) for obj in result))
+    ''' % (team, ''.join('<tr><td width="200px">%s</td><td width="200px">%s</td><td width="200px">%s</td></tr>' % (obj['team'], obj['name'], obj['phone_number']) for obj in result))
 
 
     return render_template_string(template, data_list=result)
